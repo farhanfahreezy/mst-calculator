@@ -1,4 +1,12 @@
-const Output = () => {
+import Graph from "./Graph";
+import GenerateNode from "../algorithm/GenerateNode";
+import GenerateEdges from "../algorithm/GenerateEdges";
+
+interface OutputProps {
+  graphMatrix: Number[][];
+}
+
+const Output = ({ graphMatrix }: OutputProps) => {
   return (
     <div className="flex flex-col h-full w-full items-center justify-around py-5">
       <div className="text-[36px] font-medium">
@@ -7,7 +15,12 @@ const Output = () => {
           Calculator
         </span>
       </div>
-      <div className="w-[600px] aspect-square bg-dimBlue rounded-xl"></div>
+      <div className="w-[600px] aspect-square bg-dimBlue rounded-xl overflow-hidden">
+        <Graph
+          nodes={GenerateNode(graphMatrix)}
+          edges={GenerateEdges(graphMatrix)}
+        />
+      </div>
     </div>
   );
 };

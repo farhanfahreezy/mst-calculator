@@ -1,61 +1,35 @@
-import { useRef, useEffect } from "react";
-import * as d3 from "d3";
-
-interface GraphData {
-  nodes: string[];
-  links: { source: string; target: string; weight: number }[];
-}
+import { Options, Edge, Node } from "vis-network/standalone/esm/vis-network";
+import useVisNetwork from "./useVisNetwork";
 
 interface GraphProps {
-  data: GraphData;
+  nodes: Node[];
+  edges: Edge[];
 }
 
-const Graph = ({ data }: GraphProps) => {
-  const graphRef = useRef<SVGSVGElement | null>(null);
+const Graph = ({ nodes, edges }: GraphProps) => {
+  const options: Options = {
+    nodes: {
+      shape: "dot",
+      size: 10,
+    },
+    layout: {
+      hierarchical: {
+        enabled: false,
+      },
+    },
+  };
 
-  useEffect(() => {
-    if (graphRef.current) {
-      const svg = d3.select(graphRef.current);
+  const { ref } = useVisNetwork({
+    options,
+    edges,
+    nodes,
+  });
 
-      // Set up the simulation
-      const simulation = d3
-        .forceSimulation()
-        .force("link", d3.forceLink(data.links))
-        .force("charge", d3.forceManyBody())
-        .force("center", d3.forceCenter());
-
-      // Create links
-      const links = svg
-        .selectAll("line")
-        .data(data.links)
-        .enter()
-        .append("line")
-        .attr("stroke", "gray")
-        .style("stroke-width", (d) => d.weight);
-
-      // Create nodes
-      const nodes = svg
-        .selectAll("circle")
-        .data(data.nodes)
-        .enter()
-        .append("circle")
-        .attr("r", 5)
-        .attr("fill", "steelblue");
-
-      // Update simulation on each tick
-      simulation.on("tick", () => {
-        links
-          .attr("x1", (d) => d.source.x)
-          .attr("y1", (d) => d.source.y)
-          .attr("x2", (d) => d.target.x)
-          .attr("y2", (d) => d.target.y);
-
-        nodes.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
-      });
-    }
-  }, [data]);
-
-  return <svg ref={graphRef} />;
+  return (
+    <>
+      <div style={{ height: 700, width: "100%" }} ref={ref} />
+    </>
+  );
 };
 
 export default Graph;
