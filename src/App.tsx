@@ -1,4 +1,4 @@
-import { ChangeEvent, useState, useEffect } from "react";
+import { ChangeEvent, useState } from "react";
 import FileInput from "./component/FileInput";
 import Output from "./component/Output";
 import PrimAlgorithm from "./algorithm/PrimAlgorithm";
