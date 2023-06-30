@@ -1,6 +1,8 @@
 import { ChangeEvent, useState, useEffect } from "react";
 import FileInput from "./component/FileInput";
 import Output from "./component/Output";
+import PrimAlgorithm from "./algorithm/PrimAlgorithm";
+import KruskalAlgorithm from "./algorithm/KruskalAlgorithm";
 
 const App = () => {
   const [algortihm, setAlgorithm] = useState("prim");
@@ -19,7 +21,16 @@ const App = () => {
 
   useEffect(() => {
     console.log(graphMatrix);
+    PrimAlgorithm(graphMatrix);
   }, [graphMatrix]);
+
+  const handleSolveButton = () => {
+    if (algortihm === "prim") {
+      setGraphMatrix(PrimAlgorithm(graphMatrix));
+    } else {
+      setGraphMatrix(KruskalAlgorithm(graphMatrix));
+    }
+  };
 
   const handleGraph = (matrix: Number[][]) => {
     setGraphMatrix(matrix);
@@ -37,6 +48,7 @@ const App = () => {
         algorithm={algortihm}
         onChange={handleRadioButton}
         handleGraph={handleGraph}
+        handleSolveButton={handleSolveButton}
       />
       <div className="hidden md:block md:w-2/3 md:h-full">
         <Output graphMatrix={graphMatrix} />
