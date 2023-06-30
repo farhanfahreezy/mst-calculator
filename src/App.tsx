@@ -10,19 +10,7 @@ const App = () => {
     [0, 1, 0],
     [1, 0, 10],
     [0, 10, 0],
-    // [0, 4, 0, 0, 0, 0, 0],
-    // [4, 0, 1, 3, 0, 0, 0],
-    // [0, 1, 0, 2, 0, 0, 0],
-    // [0, 3, 2, 0, 1, 0, 0],
-    // [0, 0, 0, 1, 0, 2, 0],
-    // [0, 0, 0, 0, 2, 0, 3],
-    // [0, 0, 0, 0, 0, 3, 0],
   ]);
-
-  useEffect(() => {
-    console.log(graphMatrix);
-    PrimAlgorithm(graphMatrix);
-  }, [graphMatrix]);
 
   const handleSolveButton = () => {
     if (algortihm === "prim") {
@@ -30,6 +18,22 @@ const App = () => {
     } else {
       setGraphMatrix(KruskalAlgorithm(graphMatrix));
     }
+  };
+
+  const handleAddNodes = () => {
+    const numOfRows = graphMatrix.length;
+    setGraphMatrix((rows) => rows.map((row) => [...row, 0]));
+    setGraphMatrix((rows) => [
+      ...rows,
+      Array.from({ length: numOfRows + 1 }, () => 0),
+    ]);
+  };
+
+  const handleChangeEdges = (from: number, to: number, dist: number) => {
+    const updatedMatrix = [...graphMatrix];
+    updatedMatrix[from - 1][to - 1] = dist;
+    updatedMatrix[to - 1][from - 1] = dist;
+    setGraphMatrix(updatedMatrix);
   };
 
   const handleGraph = (matrix: Number[][]) => {
@@ -42,7 +46,11 @@ const App = () => {
   return (
     <div className="w-screen h-screen overflow-x-hidden overflow-y-auto flex flex-col md:flex-row justify-start items-center bg-secondaryWhite font-openSans">
       <div className="md:hidden">
-        <Output graphMatrix={graphMatrix} />
+        <Output
+          graphMatrix={graphMatrix}
+          handleAddNodes={handleAddNodes}
+          handleChangeEdges={handleChangeEdges}
+        />
       </div>
       <FileInput
         algorithm={algortihm}
@@ -51,7 +59,11 @@ const App = () => {
         handleSolveButton={handleSolveButton}
       />
       <div className="hidden md:block md:w-2/3 md:h-full">
-        <Output graphMatrix={graphMatrix} />
+        <Output
+          graphMatrix={graphMatrix}
+          handleAddNodes={handleAddNodes}
+          handleChangeEdges={handleChangeEdges}
+        />
       </div>
     </div>
   );

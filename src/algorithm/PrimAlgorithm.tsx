@@ -13,10 +13,12 @@ function PrimAlgorithm(matrix: Number[][]): Number[][] {
 
   // Generating edges
   for (let i = 0; i < matrix.length - 1; i++) {
+    let disconnected = true;
     for (let j = i + 1; j < matrix.length; j++) {
       if (matrix[i][j] !== 0) {
         const newEdge: Edge = { from: i, to: j, distance: matrix[i][j] };
         edges.push(newEdge);
+        disconnected = false;
       }
     }
   }
@@ -29,7 +31,6 @@ function PrimAlgorithm(matrix: Number[][]): Number[][] {
   // Finding all edges
   while (matrix.length !== addedNodes.length) {
     const selectedEdge = getNearest(addedNodes, edges);
-    console.log(selectedEdge);
     fillMatrix(newMatrix, addedNodes, edges[selectedEdge]);
     edges.splice(selectedEdge, 1);
   }

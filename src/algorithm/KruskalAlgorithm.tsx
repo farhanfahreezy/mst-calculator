@@ -1,93 +1,71 @@
-interface Edge {
-  from: Number;
-  to: Number;
-  distance: Number;
-}
+type Edge = [Number, Number, Number];
 
 function KruskalAlgorithm(matrix: Number[][]): Number[][] {
-  let newMatrix: Number[][] = Array.from(matrix, (row) =>
-    Array.from(row, () => 0)
-  );
-  let addedNodes: Number[][] = [];
-  let edges: Edge[] = [];
+  const n = matrix.length;
+  const edges: Edge[] = [];
 
-  // Generating edges
-  for (let i = 0; i < matrix.length - 1; i++) {
-    for (let j = i + 1; j < matrix.length; j++) {
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
       if (matrix[i][j] !== 0) {
-        const newEdge: Edge = { from: i, to: j, distance: matrix[i][j] };
-        edges.push(newEdge);
+        edges.push([i, j, matrix[i][j]]);
       }
     }
   }
 
-  // Insert shortest path
-  edges.sort((a, b) => a.distance.valueOf() - b.distance.valueOf());
-  fillMatrix(newMatrix, addedNodes, edges[0]);
-  edges.splice(0, 1);
+  edges.sort((a, b) => a[2].valueOf() - b[2].valueOf());
+  const parent: number[] = [];
+  const rank: number[] = [];
 
-  // Finding all edges
-  let notChanging = false;
-  while (notChanging) {
-    const selectedEdge = getNearest(addedNodes, edges);
-    const oldMatrix: Number[][] = { ...newMatrix };
-    fillMatrix(newMatrix, addedNodes, edges[selectedEdge]);
-    edges.splice(selectedEdge, 1);
-    if (isEqual(oldMatrix, newMatrix)) {
-      notChanging = true;
-    }
-    console.log(newMatrix);
+  for (let i = 0; i < n; i++) {
+    parent[i] = i;
+    rank[i] = 0;
   }
 
-  return newMatrix;
-}
+  const mst: number[][] = Array(n)
+    .fill(0)
+    .map(() => Array(n).fill(0));
+  let edgeCount = 0;
 
-function getNearest(addedNodes: Number[][], edges: Edge[]): number {
-  for (let i = 0; i < edges.length; i++) {
-    if (!checkCircuit(addedNodes, edges[i])) {
-      return i;
+  for (const edge of edges) {
+    const [source, destination, weight] = edge;
+
+    const sourceRoot = find(parent, source);
+    const destRoot = find(parent, destination);
+
+    if (sourceRoot !== destRoot) {
+      union(parent, rank, sourceRoot, destRoot);
+      mst[source.valueOf()][destination.valueOf()] = Number(weight);
+      mst[destination.valueOf()][source.valueOf()] = Number(weight);
+      edgeCount++;
+
+      if (edgeCount === n - 1) {
+        break;
+      }
     }
   }
-  return 0;
+
+  return mst;
 }
 
-function fillMatrix(matrix: Number[][], addedNodes: Number[][], edge: Edge) {
-  matrix[edge.from.valueOf()][edge.to.valueOf()] = edge.distance;
-  matrix[edge.to.valueOf()][edge.from.valueOf()] = edge.distance;
-  if (addedNodes.length === 0) {
-    addedNodes.push([edge.from, edge.to]);
+function find(parent: Number[], i: Number): Number {
+  if (parent[i.valueOf()] === i) {
+    return i;
+  }
+  return find(parent, parent[i.valueOf()]);
+}
+
+function union(parent: Number[], rank: Number[], x: Number, y: Number): void {
+  const xRoot = find(parent, x);
+  const yRoot = find(parent, y);
+
+  if (rank[xRoot.valueOf()] < rank[yRoot.valueOf()]) {
+    parent[xRoot.valueOf()] = yRoot;
+  } else if (rank[yRoot.valueOf()] < rank[xRoot.valueOf()]) {
+    parent[yRoot.valueOf()] = xRoot;
   } else {
-    let isFound = false;
-    for (let i = 0; i < addedNodes.length; i++) {
-      for (let j = 0; j < addedNodes[i].length; j++) {
-        if (addedNodes[i][j] === edge.from) {
-          addedNodes[i][j] = edge.to;
-          isFound = true;
-        } else if (addedNodes[i][j] === edge.to) {
-          addedNodes[i][j] = edge.from;
-          isFound = true;
-        }
-      }
-    }
-    if (!isFound) {
-      addedNodes.push([edge.from, edge.to]);
-    }
+    parent[yRoot.valueOf()] = xRoot;
+    rank[xRoot.valueOf()] = rank[xRoot.valueOf()].valueOf() + 1;
   }
-}
-
-function checkCircuit(addedNodes: Number[][], edge: Edge): boolean {
-  for (let i = 0; i < addedNodes.length; i++) {
-    if (addedNodes[i].includes(edge.from) && addedNodes[i].includes(edge.to)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function isEqual(oldMatrix: Number[][], newMatrix: Number[][]): boolean {
-  return oldMatrix.every((row, rowIndex) =>
-    row.every((value, colIndex) => value === newMatrix[rowIndex][colIndex])
-  );
 }
 
 export default KruskalAlgorithm;

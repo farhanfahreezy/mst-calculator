@@ -27,7 +27,7 @@ const Graph = ({ nodes, edges }: GraphProps) => {
 
   return (
     <>
-      <div style={{ height: 700, width: "100%" }} ref={ref} />
+      <div className="w-full h-full" ref={ref} />
     </>
   );
 };
