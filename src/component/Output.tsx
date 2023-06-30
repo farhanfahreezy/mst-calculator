@@ -1,4 +1,5 @@
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, useEffect } from "react";
+import { Edge, Node } from "vis-network/standalone/esm/vis-network";
 import Graph from "./Graph";
 import GenerateNode from "../algorithm/GenerateNode";
 import GenerateEdges from "../algorithm/GenerateEdges";
@@ -8,17 +9,28 @@ interface OutputProps {
   graphMatrix: Number[][];
   handleAddNodes: () => void;
   handleChangeEdges: (from: number, to: number, dist: number) => void;
+  handleRemoveNodes: (n: number) => void;
 }
 
 const Output = ({
   graphMatrix,
   handleAddNodes,
   handleChangeEdges,
+  handleRemoveNodes,
 }: OutputProps) => {
   const [nodeFrom, setNodeFrom] = useState(1);
   const [nodeTo, setNodeTo] = useState(2);
   const [distance, setDistance] = useState(0);
   const [wrongInput, setWrongInput] = useState(false);
+  const [nodeRemove, setNodeRemove] = useState(0);
+
+  const [nodes, setNodes] = useState<Node[]>();
+  const [edges, setEdges] = useState<Edge[]>();
+
+  useEffect(() => {
+    setNodes(GenerateNode(graphMatrix));
+    setEdges(GenerateEdges(graphMatrix));
+  }, [graphMatrix]);
 
   const handleNodeFromChange = (event: ChangeEvent<HTMLInputElement>) => {
     const val = parseInt(event.target.value);
@@ -47,6 +59,16 @@ const Output = ({
       setDistance(0);
     }
   };
+
+  const handleNodeRemoveChange = (event: ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault();
+    const val = parseInt(event.target.value);
+    if (val) {
+      setNodeRemove(val);
+    } else {
+      setNodeRemove(0);
+    }
+  };
   return (
     <div className="flex flex-col h-full w-full items-center pt-10">
       <div className="text-[36px] font-medium">
@@ -57,10 +79,7 @@ const Output = ({
       </div>
       <div className="flex flex-row h-full w-fit px-10 gap-10 items-center justify-center">
         <div className="w-[600px] aspect-square bg-dimBlue rounded-xl overflow-hidden shadow-inner hover:shadow-inner-xl">
-          <Graph
-            nodes={GenerateNode(graphMatrix)}
-            edges={GenerateEdges(graphMatrix)}
-          />
+          <Graph nodes={nodes!} edges={edges!} />
         </div>
         <div className="flex flex-col gap-2 bg-white p-5 rounded-xl shadow-md relative">
           <div
@@ -85,6 +104,27 @@ const Output = ({
             onClick={handleAddNodes}
           >
             Add Node
+          </button>
+          <div className="flex flex-row justify-between items-center bg-secondaryWhite py-2 px-4 rounded-md shadow-inner-xl">
+            <div>Node Remove</div>
+            <input
+              value={nodeRemove}
+              onChange={handleNodeRemoveChange}
+              className="px-2 my-1 w-[50px] text-right bg-white rounded-md"
+            ></input>
+          </div>
+          <button
+            className="py-[6px] hover:py-[8px] bg-white text-primaryBlue border-primaryBlue border-[2px] rounded-md hover:bg-primaryBlue hover:border-0 hover:text-white font-medium transition-all"
+            onClick={() => {
+              const numOfRow = graphMatrix.length;
+              if (nodeRemove > 0 && nodeRemove < numOfRow + 1) {
+                handleRemoveNodes(nodeRemove);
+              } else {
+                setWrongInput(true);
+              }
+            }}
+          >
+            Remove Node
           </button>
           <div className="py-2 px-4 bg-secondaryWhite rounded-md shadow-inner-xl">
             <div className="flex flex-row justify-between items-center">

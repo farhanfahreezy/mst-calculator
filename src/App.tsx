@@ -29,6 +29,15 @@ const App = () => {
     ]);
   };
 
+  const handleRemoveNodes = (nodes: number) => {
+    const updatedMatrix = [...graphMatrix];
+    updatedMatrix.splice(nodes - 1, 1);
+    for (let i = 0; i < updatedMatrix.length; i++) {
+      updatedMatrix[i].splice(nodes - 1, 1);
+    }
+    setGraphMatrix(updatedMatrix);
+  };
+
   const handleChangeEdges = (from: number, to: number, dist: number) => {
     const updatedMatrix = [...graphMatrix];
     updatedMatrix[from - 1][to - 1] = dist;
@@ -50,6 +59,7 @@ const App = () => {
           graphMatrix={graphMatrix}
           handleAddNodes={handleAddNodes}
           handleChangeEdges={handleChangeEdges}
+          handleRemoveNodes={handleRemoveNodes}
         />
       </div>
       <FileInput
@@ -63,6 +73,7 @@ const App = () => {
           graphMatrix={graphMatrix}
           handleAddNodes={handleAddNodes}
           handleChangeEdges={handleChangeEdges}
+          handleRemoveNodes={handleRemoveNodes}
         />
       </div>
     </div>
