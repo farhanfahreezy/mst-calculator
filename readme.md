@@ -32,7 +32,7 @@ To install this web app, follow the steps below:
 2. Navigate to the root folder execute `npm i` and then `npm run dev`.
 3. Open https://localhost:5173/ in your web browser.
 
-Alternatively, you can directly use this web app by visiting `not deployed hehe`.
+Alternatively, you can directly use this web app by visiting https://mst-calculator.vercel.app/.
 
 ## Usage
 
